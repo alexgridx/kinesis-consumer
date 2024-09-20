@@ -271,25 +271,8 @@ func (c *Consumer) processRecords(ctx context.Context, shardID string, resp *kin
 		return "", nil
 	}
 
-	timeout := 5 * time.Second
-	timeoutContext, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	errGroup, ctx := errgroup.WithContext(timeoutContext)
-	errGroup.SetLimit(c.numWorkers)
-	for _, r := range records {
-		errGroup.Go(func() error {
-			err := fn(&Record{Record: r, ShardID: shardID, MillisBehindLatest: resp.MillisBehindLatest})
-			if !errors.Is(err, ErrSkipCheckpoint) {
-				return err
-			}
-			// When do we write the checkpoint?
-			return nil
-		})
-	}
-
-	if err := errGroup.Wait(); err != nil {
-		// Or here?
+	err = c.runWorkers(ctx, shardID, resp, fn, records)
+	if err != nil {
 		return "", err
 	}
 
@@ -315,6 +298,28 @@ func (c *Consumer) processRecords(ctx context.Context, shardID string, resp *kin
 		With(prometheus.Labels{labelStreamName: c.streamName, labelShardID: shardID}).
 		Observe(duration / batchSize)
 	return lastSeqNum, nil
+}
+
+// runWorkers launches a worker pool to process the records
+func (c *Consumer) runWorkers(ctx context.Context, shardID string, resp *kinesis.GetRecordsOutput, fn ScanFunc, records []types.Record) error {
+	timeout := 5 * time.Second
+	timeoutContext, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	errGroup, ctx := errgroup.WithContext(timeoutContext)
+	errGroup.SetLimit(c.numWorkers)
+	for _, r := range records {
+		errGroup.Go(func() error {
+			err := fn(&Record{Record: r, ShardID: shardID, MillisBehindLatest: resp.MillisBehindLatest})
+			if !errors.Is(err, ErrSkipCheckpoint) {
+				return err
+			}
+			// When do we write the checkpoint?
+			return nil
+		})
+	}
+
+	return errGroup.Wait()
 }
 
 // temporary conversion func of []types.Record -> DesegregateRecords([]*types.Record) -> []types.Record

@@ -302,11 +302,7 @@ func (c *Consumer) processRecords(ctx context.Context, shardID string, resp *kin
 
 // runWorkers launches a worker pool to process the records
 func (c *Consumer) runWorkers(ctx context.Context, shardID string, resp *kinesis.GetRecordsOutput, fn ScanFunc, records []types.Record) error {
-	timeout := 5 * time.Second
-	timeoutContext, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	errGroup, ctx := errgroup.WithContext(timeoutContext)
+	errGroup, ctx := errgroup.WithContext(ctx)
 	errGroup.SetLimit(c.numWorkers)
 	for _, r := range records {
 		errGroup.Go(func() error {
@@ -314,7 +310,6 @@ func (c *Consumer) runWorkers(ctx context.Context, shardID string, resp *kinesis
 			if !errors.Is(err, ErrSkipCheckpoint) {
 				return err
 			}
-			// When do we write the checkpoint?
 			return nil
 		})
 	}

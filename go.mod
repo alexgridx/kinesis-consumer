@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/alicebob/miniredis v2.5.0+incompatible
-	github.com/aws/aws-sdk-go-v2 v1.31.0
+	github.com/aws/aws-sdk-go-v2 v1.32.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.39
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.37
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.15.8
@@ -35,7 +35,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.23.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.27.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.31.3 // indirect
-	github.com/aws/smithy-go v1.21.0 // indirect
+	github.com/aws/smithy-go v1.22.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

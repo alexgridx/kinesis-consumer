@@ -1,3 +1,39 @@
+# v1.18.4 (2025-02-11)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.18.3 (2025-02-06)
+
+* No change notes available for this release.
+
+# v1.18.2 (2025-02-05)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.18.1 (2025-02-04)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.18.0 (2025-01-31)
+
+* **Feature**: Add FixUnmarshalIndividualSetValues option to DecoderOptions to fix unmarshalling of individual values of StringSet, NumberSet, and BinarySet attributes.
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.17.0 (2025-01-30)
+
+* **Feature**: Add FixUnmarshalIndividualSetValues option to DecoderOptions to fix unmarshalling of individual values of StringSet, NumberSet, and BinarySet attributes.
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.16.0 (2025-01-24)
+
+* **Feature**: Add FixUnmarshalIndividualSetValues option to DecoderOptions to fix unmarshalling of individual values of StringSet, NumberSet, and BinarySet attributes.
+* **Dependency Update**: Updated to the latest SDK module versions
+* **Dependency Update**: Upgrade to smithy-go v1.22.2.
+
+# v1.15.28 (2025-01-17)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
 # v1.15.27 (2025-01-15)
 
 * **Dependency Update**: Updated to the latest SDK module versions

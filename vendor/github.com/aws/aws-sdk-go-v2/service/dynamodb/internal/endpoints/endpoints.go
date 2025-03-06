@@ -464,19 +464,27 @@ var defaultPartitions = endpoints.Partitions{
 				Variant: endpoints.FIPSVariant,
 			}: {
 				Hostname:          "dynamodb-fips.{region}.csp.hci.ic.gov",
-				Protocols:         []string{"https"},
+				Protocols:         []string{"http", "https"},
 				SignatureVersions: []string{"v4"},
 			},
 			{
 				Variant: 0,
 			}: {
 				Hostname:          "dynamodb.{region}.csp.hci.ic.gov",
-				Protocols:         []string{"https"},
+				Protocols:         []string{"http", "https"},
 				SignatureVersions: []string{"v4"},
 			},
 		},
 		RegionRegex:    partitionRegexp.AwsIsoF,
 		IsRegionalized: true,
+		Endpoints: endpoints.Endpoints{
+			endpoints.EndpointKey{
+				Region: "us-isof-east-1",
+			}: endpoints.Endpoint{},
+			endpoints.EndpointKey{
+				Region: "us-isof-south-1",
+			}: endpoints.Endpoint{},
+		},
 	},
 	{
 		ID: "aws-us-gov",
@@ -520,12 +528,12 @@ var defaultPartitions = endpoints.Partitions{
 				Region:  "us-gov-east-1",
 				Variant: endpoints.FIPSVariant,
 			}: {
-				Hostname: "dynamodb.us-gov-east-1.amazonaws.com",
+				Hostname: "dynamodb-fips.us-gov-east-1.amazonaws.com",
 			},
 			endpoints.EndpointKey{
 				Region: "us-gov-east-1-fips",
 			}: endpoints.Endpoint{
-				Hostname: "dynamodb.us-gov-east-1.amazonaws.com",
+				Hostname: "dynamodb-fips.us-gov-east-1.amazonaws.com",
 				CredentialScope: endpoints.CredentialScope{
 					Region: "us-gov-east-1",
 				},
@@ -538,12 +546,12 @@ var defaultPartitions = endpoints.Partitions{
 				Region:  "us-gov-west-1",
 				Variant: endpoints.FIPSVariant,
 			}: {
-				Hostname: "dynamodb.us-gov-west-1.amazonaws.com",
+				Hostname: "dynamodb-fips.us-gov-west-1.amazonaws.com",
 			},
 			endpoints.EndpointKey{
 				Region: "us-gov-west-1-fips",
 			}: endpoints.Endpoint{
-				Hostname: "dynamodb.us-gov-west-1.amazonaws.com",
+				Hostname: "dynamodb-fips.us-gov-west-1.amazonaws.com",
 				CredentialScope: endpoints.CredentialScope{
 					Region: "us-gov-west-1",
 				},

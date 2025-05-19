@@ -1,6 +1,7 @@
 module github.com/alexgridx/kinesis-consumer
 
-go 1.22
+go 1.23.0
+
 toolchain go1.24.1
 
 require (
@@ -17,7 +18,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.22.0
-	github.com/redis/go-redis/v9 v9.7.3
+	github.com/redis/go-redis/v9 v9.8.0
 	golang.org/x/sync v0.14.0
 )
 

@@ -1,6 +1,7 @@
 module github.com/alexgridx/kinesis-consumer
 
-go 1.22
+go 1.23.0
+
 toolchain go1.24.1
 
 require (
@@ -47,6 +48,6 @@ require (
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )

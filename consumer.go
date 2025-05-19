@@ -41,6 +41,7 @@ func New(streamName string, opts ...Option) (*Consumer, error) {
 		initialShardIteratorType: types.ShardIteratorTypeLatest,
 		store:                    &noopStore{},
 		counter:                  &noopCounter{},
+		getRecordsOpts:           []func(*kinesis.Options){},
 		logger:                   slog.New(slog.NewTextHandler(io.Discard, nil)),
 		scanInterval:             250 * time.Millisecond,
 		maxRecords:               10000,
@@ -93,14 +94,14 @@ type Consumer struct {
 	counter            Counter
 	group              Group
 	logger             *slog.Logger
-	metricRegistry     prometheus.Registerer
 	store              Store
 	scanInterval       time.Duration
 	maxRecords         int64
 	isAggregated       bool
 	shardClosedHandler ShardClosedHandler
+	getRecordsOpts     []func(*kinesis.Options)
+	metricRegistry     prometheus.Registerer
 	numWorkers         int
-	workerPool         *WorkerPool
 }
 
 // ScanFunc is the type of the function called for each message read
@@ -183,10 +184,6 @@ func (c *Consumer) Scan(ctx context.Context, fn ScanFunc) error {
 // ScanShard loops over records on a specific shard, calls the callback func for each record and checkpoints the
 // progress of scan.
 func (c *Consumer) ScanShard(ctx context.Context, shardID string, fn ScanFunc) error {
-	c.workerPool = NewWorkerPool(c.streamName, c.numWorkers, fn)
-	c.workerPool.Start(ctx)
-	defer c.workerPool.Stop()
-
 	// get last seq number from checkpoint
 	lastSeqNum, err := c.group.GetCheckpoint(ctx, c.streamName, shardID)
 	if err != nil {
@@ -211,12 +208,12 @@ func (c *Consumer) ScanShard(ctx context.Context, shardID string, fn ScanFunc) e
 		resp, err := c.client.GetRecords(ctx, &kinesis.GetRecordsInput{
 			Limit:         aws.Int32(int32(c.maxRecords)),
 			ShardIterator: shardIterator,
-		})
+		}, c.getRecordsOpts...)
 
 		// attempt to recover from GetRecords error
 		if err != nil {
 			if !isRetriableError(err) {
-				return fmt.Errorf("get records error: %v", err.Error())
+				return fmt.Errorf("get records error: %w", err)
 			}
 
 			c.logger.WarnContext(ctx, "get records", slog.String("error", err.Error()))

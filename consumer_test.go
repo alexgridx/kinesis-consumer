@@ -317,6 +317,7 @@ func TestScanShard_ShardIsClosed_WithShardClosedHandler(t *testing.T) {
 }
 
 func TestScanShard_GetRecordsError(t *testing.T) {
+	getRecordsError := &types.InvalidArgumentException{Message: aws.String("aws error message")}
 	var client = &kinesisClientMock{
 		getShardIteratorMock: func(_ context.Context, _ *kinesis.GetShardIteratorInput, _ ...func(*kinesis.Options)) (*kinesis.GetShardIteratorOutput, error) {
 			return &kinesis.GetShardIteratorOutput{
@@ -327,8 +328,7 @@ func TestScanShard_GetRecordsError(t *testing.T) {
 			return &kinesis.GetRecordsOutput{
 					NextShardIterator: nil,
 					Records:           nil,
-				},
-				&types.InvalidArgumentException{Message: aws.String("aws error message")}
+				}, getRecordsError
 		},
 	}
 
@@ -343,6 +343,10 @@ func TestScanShard_GetRecordsError(t *testing.T) {
 
 	err = c.ScanShard(context.Background(), "myShard", fn)
 	if err.Error() != "get records error: InvalidArgumentException: aws error message" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !errors.Is(err, getRecordsError) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }

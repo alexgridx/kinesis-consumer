@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/kinesis"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -81,6 +82,14 @@ func WithScanInterval(d time.Duration) Option {
 func WithMaxRecords(n int64) Option {
 	return func(c *Consumer) {
 		c.maxRecords = n
+	}
+}
+
+// WithGetRecordsOptions passes the given option functions to the
+// kinesis client's GetRecords call
+func WithGetRecordsOptions(opts ...func(*kinesis.Options)) Option {
+	return func(c *Consumer) {
+		c.getRecordsOpts = opts
 	}
 }
 

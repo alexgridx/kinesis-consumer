@@ -161,9 +161,13 @@ github.com/gomodule/redigo/internal
 github.com/gomodule/redigo/redis
 # github.com/kr/text v0.2.0
 ## explicit
-# github.com/lib/pq v1.10.9
-## explicit; go 1.13
+# github.com/lib/pq v1.11.0
+## explicit; go 1.21
 github.com/lib/pq
+github.com/lib/pq/internal/pgpass
+github.com/lib/pq/internal/pqsql
+github.com/lib/pq/internal/pqutil
+github.com/lib/pq/internal/proto
 github.com/lib/pq/oid
 github.com/lib/pq/scram
 # github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822

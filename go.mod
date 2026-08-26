@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.47.0
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20241004223953-c2774b1ab29b
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/lib/pq v1.11.2
+	github.com/lib/pq v1.12.3
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.18.0

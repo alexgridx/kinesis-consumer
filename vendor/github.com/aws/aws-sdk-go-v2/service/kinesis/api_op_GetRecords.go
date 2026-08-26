@@ -4,12 +4,9 @@ package kinesis
 
 import (
 	"context"
-	"fmt"
-	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"github.com/aws/smithy-go/middleware"
 	"github.com/aws/smithy-go/ptr"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Gets data records from a Kinesis data stream's shard.
@@ -36,12 +33,15 @@ import (
 // the shard iterator reaches the record with the sequence number or other
 // attribute that marks it as the last record to process.
 //
-// Each data record can be up to 1 MiB in size, and each shard can read up to 2
-// MiB per second. You can ensure that your calls don't exceed the maximum
-// supported size or throughput by using the Limit parameter to specify the
-// maximum number of records that GetRecordscan return. Consider your average record size
-// when determining this limit. The maximum number of records that can be returned
-// per call is 10,000.
+// Each data record can be up to 1 MiB in size by default. Amazon Kinesis Data
+// Streams supports large records up to 10 MiB in size, but the average throughput
+// for your stream cannot exceed 1 MiB per second. For more information about how
+// large records are handled, see [Large records]. Each shard can read up to 2 MiB per second.
+// You can ensure that your calls don't exceed the maximum supported size or
+// throughput by using the Limit parameter to specify the maximum number of
+// records that GetRecordscan return. Consider your average record size when determining
+// this limit. The maximum number of records that can be returned per call is
+// 10,000.
 //
 // The size of the data returned by GetRecords varies depending on the utilization of the
 // shard. It is recommended that consumer applications retrieve records via the
@@ -74,6 +74,7 @@ import (
 // This operation has a limit of five transactions per second per shard.
 //
 // [Amazon Kinesis Data Streams Limits]: https://docs.aws.amazon.com/kinesis/latest/dev/service-sizes-and-limits.html
+// [Large records]: https://docs.aws.amazon.com/streams/latest/dev/large-records.html
 // [Monitoring]: https://docs.aws.amazon.com/kinesis/latest/dev/monitoring.html
 func (c *Client) GetRecords(ctx context.Context, params *GetRecordsInput, optFns ...func(*Options)) (*GetRecordsOutput, error) {
 	if params == nil {
@@ -151,9 +152,6 @@ type GetRecordsOutput struct {
 }
 
 func (c *Client) addOperationGetRecordsMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
-		return err
-	}
 	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetRecords{}, middleware.After)
 	if err != nil {
 		return err
@@ -162,19 +160,7 @@ func (c *Client) addOperationGetRecordsMiddlewares(stack *middleware.Stack, opti
 	if err != nil {
 		return err
 	}
-	if err := addProtocolFinalizerMiddlewares(stack, options, "GetRecords"); err != nil {
-		return fmt.Errorf("add protocol finalizers: %v", err)
-	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addSetLoggerMiddleware(stack, options); err != nil {
-		return err
-	}
-	if err = addClientRequestID(stack); err != nil {
-		return err
-	}
 	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
@@ -184,46 +170,16 @@ func (c *Client) addOperationGetRecordsMiddlewares(stack *middleware.Stack, opti
 	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetry(stack, options); err != nil {
+	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = addRawResponseToMetadata(stack); err != nil {
-		return err
-	}
-	if err = addRecordResponseTiming(stack); err != nil {
-		return err
-	}
-	if err = addSpanRetryLoop(stack, options); err != nil {
-		return err
-	}
-	if err = addClientUserAgent(stack, options); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
-		return err
-	}
-	if err = addTimeOffsetBuild(stack, c); err != nil {
-		return err
-	}
-	if err = addUserAgentRetryMode(stack, options); err != nil {
+	if err = addUserAgentAccountIDEndpointMode(stack, options); err != nil {
 		return err
 	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetRecordsValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opGetRecords(options.Region), middleware.Before); err != nil {
-		return err
-	}
-	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -238,22 +194,8 @@ func (c *Client) addOperationGetRecordsMiddlewares(stack *middleware.Stack, opti
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptAttempt(stack, options); err != nil {
-		return err
-	}
 	if err = addInterceptors(stack, options); err != nil {
 		return err
 	}
 	return nil
-}
-
-func newServiceMetadataMiddleware_opGetRecords(region string) *awsmiddleware.RegisterServiceMetadata {
-	return &awsmiddleware.RegisterServiceMetadata{
-		Region:        region,
-		ServiceID:     ServiceID,
-		OperationName: "GetRecords",
-	}
 }

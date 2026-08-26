@@ -4,18 +4,16 @@ package kinesis
 
 import (
 	"context"
-	"fmt"
-	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"github.com/aws/smithy-go/middleware"
 	"github.com/aws/smithy-go/ptr"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Updates the warm throughput configuration for the specified Amazon Kinesis Data
-// Streams on-demand data stream. This operation allows you to proactively scale
-// your on-demand data stream to a specified throughput level, enabling better
-// performance for sudden traffic spikes.
+// Streams on-demand data stream. Updates the warm throughput configuration for the
+// specified on-demand data stream. Use this operation to scale your stream to a
+// specified throughput level before anticipated traffic spikes, or to release
+// excess capacity after traffic has decreased.
 //
 // When invoking this API, you must use either the StreamARN or the StreamName
 // parameter, or both. It is recommended that you use the StreamARN input
@@ -31,6 +29,9 @@ import (
 // This operation is only supported for data streams with the on-demand capacity
 // mode in accounts that have MinimumThroughputBillingCommitment enabled.
 // Provisioned capacity mode streams do not support warm throughput configuration.
+//
+// To release excess capacity, call the API again and set the warm throughput to
+// the same or a lower value.
 //
 // This operation has the following default limits. By default, you cannot do the
 // following:
@@ -108,9 +109,6 @@ type UpdateStreamWarmThroughputOutput struct {
 }
 
 func (c *Client) addOperationUpdateStreamWarmThroughputMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
-		return err
-	}
 	err = stack.Serialize.Add(&awsAwsjson11_serializeOpUpdateStreamWarmThroughput{}, middleware.After)
 	if err != nil {
 		return err
@@ -119,19 +117,7 @@ func (c *Client) addOperationUpdateStreamWarmThroughputMiddlewares(stack *middle
 	if err != nil {
 		return err
 	}
-	if err := addProtocolFinalizerMiddlewares(stack, options, "UpdateStreamWarmThroughput"); err != nil {
-		return fmt.Errorf("add protocol finalizers: %v", err)
-	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addSetLoggerMiddleware(stack, options); err != nil {
-		return err
-	}
-	if err = addClientRequestID(stack); err != nil {
-		return err
-	}
 	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
@@ -141,46 +127,16 @@ func (c *Client) addOperationUpdateStreamWarmThroughputMiddlewares(stack *middle
 	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetry(stack, options); err != nil {
+	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = addRawResponseToMetadata(stack); err != nil {
-		return err
-	}
-	if err = addRecordResponseTiming(stack); err != nil {
-		return err
-	}
-	if err = addSpanRetryLoop(stack, options); err != nil {
-		return err
-	}
-	if err = addClientUserAgent(stack, options); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
-		return err
-	}
-	if err = addTimeOffsetBuild(stack, c); err != nil {
-		return err
-	}
-	if err = addUserAgentRetryMode(stack, options); err != nil {
+	if err = addUserAgentAccountIDEndpointMode(stack, options); err != nil {
 		return err
 	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpUpdateStreamWarmThroughputValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opUpdateStreamWarmThroughput(options.Region), middleware.Before); err != nil {
-		return err
-	}
-	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -195,22 +151,8 @@ func (c *Client) addOperationUpdateStreamWarmThroughputMiddlewares(stack *middle
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
-		return err
-	}
-	if err = addInterceptAttempt(stack, options); err != nil {
-		return err
-	}
 	if err = addInterceptors(stack, options); err != nil {
 		return err
 	}
 	return nil
-}
-
-func newServiceMetadataMiddleware_opUpdateStreamWarmThroughput(region string) *awsmiddleware.RegisterServiceMetadata {
-	return &awsmiddleware.RegisterServiceMetadata{
-		Region:        region,
-		ServiceID:     ServiceID,
-		OperationName: "UpdateStreamWarmThroughput",
-	}
 }

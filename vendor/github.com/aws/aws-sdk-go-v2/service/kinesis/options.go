@@ -26,6 +26,9 @@ type Options struct {
 	// modify this list for per operation behavior.
 	APIOptions []func(*middleware.Stack) error
 
+	// Indicates how aws account ID is applied in endpoint2.0 routing
+	AccountIDEndpointMode aws.AccountIDEndpointMode
+
 	// The optional application specific identifier appended to the User-Agent header.
 	AppID string
 
@@ -43,6 +46,11 @@ type Options struct {
 	// The configuration DefaultsMode that the SDK should use when constructing the
 	// clients initial default settings.
 	DefaultsMode aws.DefaultsMode
+
+	// Disables SDK clock skew correction. When set, the SDK will not adjust request
+	// signing timestamps to compensate for clock drift between the client and the
+	// service.
+	DisableClockSkewCorrection bool
 
 	// The endpoint options to be used when attempting to resolve an endpoint.
 	EndpointOptions EndpointResolverOptions
